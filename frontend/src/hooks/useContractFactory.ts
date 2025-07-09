@@ -110,11 +110,8 @@ export function createContractHook<T extends ContractName>(contractName: T) {
           // Use cached sync client or create new one
           let syncClient = syncClientCache.get(privateKey);
           if (!syncClient) {
-            console.log('🔧 Creating new RiseSyncClient for embedded wallet');
             syncClient = new RiseSyncClient(privateKey);
             syncClientCache.set(privateKey, syncClient);
-          } else {
-            console.log('♻️ Reusing cached RiseSyncClient for embedded wallet');
           }
           
           const { abi } = getContractParams();

@@ -37,6 +37,19 @@ export function useChatAppContract() {
     return await read('topics', [topicId]) as string;
   }, [read]);
 
+  const getTopicRating = useCallback(async (topicId: number): Promise<{ averageRating: number; totalRatings: number }> => {
+    const result = await read('getTopicRating', [topicId]) as [bigint, bigint];
+    return {
+      averageRating: Number(result[0]) / 100, // Convert from percentage to decimal
+      totalRatings: Number(result[1])
+    };
+  }, [read]);
+
+  const getUserTopicRating = useCallback(async (address: string, topicId: number): Promise<number> => {
+    const rating = await read('userTopicRatings', [address, topicId]) as number;
+    return rating;
+  }, [read]);
+
   // Write functions with proper typing
   const registerUser = useCallback(async (userId: string) => {
     return await write('registerUser', [userId]);
@@ -62,6 +75,10 @@ export function useChatAppContract() {
     return await write('createTopic', [topic]);
   }, [write]);
 
+  const rateTopic = useCallback(async (topicId: number, rating: number) => {
+    return await write('rateTopic', [topicId, rating]);
+  }, [write]);
+
   // Backward compatibility aliases
   const giveKarma = likeMessage;
   const takeKarma = dislikeMessage;
@@ -76,6 +93,8 @@ export function useChatAppContract() {
     getKarma,
     getTopicId,
     getTopics,
+    getTopicRating,
+    getUserTopicRating,
     
     // Write functions
     registerUser,
@@ -85,6 +104,7 @@ export function useChatAppContract() {
     likeMessage,
     dislikeMessage,
     createTopic,
+    rateTopic,
     giveKarma, // Backward compatibility
     takeKarma, // Backward compatibility
   };

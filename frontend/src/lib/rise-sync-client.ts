@@ -1,11 +1,11 @@
-import { createPublicSyncClient, shredsWebSocket } from 'shreds/viem';
+import { createPublicShredClient } from 'shreds/viem';
 import { createWalletClient, createPublicClient, http, formatEther, parseGwei, type WalletClient, type Account, type PublicClient } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { riseTestnet } from 'viem/chains';
-import { RISE_RPC_URL, RISE_WS_URL } from '@/config/websocket';
+import { RISE_RPC_URL } from '@/config/websocket';
 import { NonceManager } from './wallet/NonceManager';
 
-type SyncClient = ReturnType<typeof createPublicSyncClient>;
+type SyncClient = ReturnType<typeof createPublicShredClient>;
 
 export class RiseSyncClient {
   private syncClient: SyncClient;
@@ -20,9 +20,9 @@ export class RiseSyncClient {
     this.account = privateKeyToAccount(privateKey as `0x${string}`);
     
     // Create sync client for sending transactions
-    this.syncClient = createPublicSyncClient({
+    this.syncClient = createPublicShredClient({
       chain: riseTestnet,
-      transport: shredsWebSocket(RISE_WS_URL),
+      transport: http(RISE_RPC_URL),
     });
     
     // Create wallet client for signing transactions
@@ -65,9 +65,6 @@ export class RiseSyncClient {
         gasLimit: tx.gasLimit
       });
       
-      // Ensure we're initialized before proceeding
-      await this.initialize();
-      
       // Get nonce from the nonce manager
       const nonce = await this.nonceManager.getNonce();
       console.log('📝 Using nonce:', nonce);
@@ -98,7 +95,7 @@ export class RiseSyncClient {
       
       // Send using sync method for instant confirmation
       const receipt = await this.syncClient.sendRawTransactionSync({
-        serializedTransaction,
+        serializedTransaction
       });
       
       console.log('✅ Transaction confirmed :', receipt);

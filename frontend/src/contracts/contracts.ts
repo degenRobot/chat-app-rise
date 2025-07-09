@@ -8,9 +8,9 @@ import ERC1967ProxyABI from './abi/ERC1967Proxy.json';
 
 export const contracts = {
   ChatApp: {
-    address: '0xdebd7482fc04282d6d3365608a83e1e1c6367e12' as const,
-    deploymentTxHash: '0xbaced4dddee0903a33f39c0c6c6cd582d506db19a82b8bbd3c449b4b357c56c9',
-    blockNumber: 0xfff569,
+    address: '0xac10ec5135e3c6db04218be318cc603c85b765ce' as const,
+    deploymentTxHash: '0x80949d6d7162b6c45f5a3bf083a7c34bf21d44b18c7ce83798c75615025a03ad',
+    blockNumber: 0x10257b9,
     abi: ChatAppABI
   },
 } as const;
@@ -33,5 +33,5 @@ export function getContractABI(name: ContractName) {
 }
 
 // Re-export specific contracts for convenience
-export const CHATAPP_ADDRESS = '0xdebd7482fc04282d6d3365608a83e1e1c6367e12' as const;
+export const CHATAPP_ADDRESS = '0xac10ec5135e3c6db04218be318cc603c85b765ce' as const;
 export const CHATAPP_ABI = ChatAppABI;

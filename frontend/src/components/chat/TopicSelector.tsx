@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 import { toast } from '@/lib/toast-manager';
+import { StarRating } from './StarRating';
+import { useAccount } from 'wagmi';
 
 interface TopicSelectorProps {
   selectedTopic: number;
@@ -13,6 +15,9 @@ interface TopicSelectorProps {
   getTopicId: () => Promise<number>;
   getTopics: (topicId: number) => Promise<string>;
   createTopic: (topic: string) => Promise<any>;
+  getTopicRating: (topicId: number) => Promise<{ averageRating: number; totalRatings: number }>;
+  getUserTopicRating: (address: string, topicId: number) => Promise<number>;
+  rateTopic: (topicId: number, rating: number) => Promise<any>;
 }
 
 export function TopicSelector({ 
@@ -21,11 +26,15 @@ export function TopicSelector({
   topics,
   getTopicId,
   getTopics,
-  createTopic
+  createTopic,
+  getTopicRating,
+  getUserTopicRating,
+  rateTopic
 }: TopicSelectorProps) {
   const [isCreatingTopic, setIsCreatingTopic] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
   const [showCreateInput, setShowCreateInput] = useState(false);
+  const { address } = useAccount();
   
   // Filter out topic 0 (General) and add "All Topics" option
   const filteredTopics = topics.filter(t => t.id !== 0);
@@ -115,6 +124,16 @@ export function TopicSelector({
           <Plus className="w-4 h-4" />
           New Topic
         </Button>
+      )}
+
+      {selectedTopic >= 0 && address && (
+        <StarRating
+          topicId={selectedTopic}
+          getTopicRating={getTopicRating}
+          getUserTopicRating={getUserTopicRating}
+          rateTopic={rateTopic}
+          userAddress={address}
+        />
       )}
     </div>
   );

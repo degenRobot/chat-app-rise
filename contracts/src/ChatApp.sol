@@ -22,6 +22,11 @@ contract ChatApp is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     mapping(uint256 => int256) msgNetLikes;
     mapping(uint256 => int256) topNeticLikes;
 
+    // Topic rating storage
+    mapping(address => mapping(uint256 => uint8)) public userTopicRatings;
+    mapping(uint256 => uint256) public topicTotalRatings;
+    mapping(uint256 => uint256) public topicRatingSum;
+
     uint256 public msgId;
     uint256 public topicId;
 
@@ -34,6 +39,7 @@ contract ChatApp is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     event MessageDisliked(address indexed user, string userId, uint256 msgId);
     event KarmaChanged(address indexed user, string userId, int256 karma);
     event TopicCreated(uint256 indexed topicId, string topic);
+    event TopicRated(address indexed user, uint256 indexed topicId, uint8 rating);
 
     // --- Initializer --- //
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -133,6 +139,38 @@ contract ChatApp is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         topics[topicId] = _topic;
         emit TopicCreated(topicId, _topic);
         topicId++;
+    }
+
+    function rateTopic(uint256 _topicId, uint8 _rating) public {
+        require(isUserRegistered[msg.sender], "User not registered");
+        require(_topicId < topicId, "Invalid topicId");
+        require(_rating >= 1 && _rating <= 5, "Rating must be between 1 and 5");
+
+        uint8 previousRating = userTopicRatings[msg.sender][_topicId];
+        
+        if (previousRating == 0) {
+            // First time rating
+            topicTotalRatings[_topicId]++;
+            topicRatingSum[_topicId] += _rating;
+        } else {
+            // Update existing rating
+            topicRatingSum[_topicId] = topicRatingSum[_topicId] - previousRating + _rating;
+        }
+        
+        userTopicRatings[msg.sender][_topicId] = _rating;
+        emit TopicRated(msg.sender, _topicId, _rating);
+    }
+
+    function getTopicRating(uint256 _topicId) public view returns (uint256 averageRating, uint256 totalRatings) {
+        require(_topicId < topicId, "Invalid topicId");
+        
+        totalRatings = topicTotalRatings[_topicId];
+        if (totalRatings == 0) {
+            return (0, 0);
+        }
+        
+        averageRating = (topicRatingSum[_topicId] * 100) / totalRatings;
+        return (averageRating, totalRatings);
     }
 
     /**

@@ -47,7 +47,10 @@ export function ChatInterface({ address }: ChatInterfaceProps) {
     getUserId,
     getTopicId,
     getTopics,
-    createTopic
+    createTopic,
+    getTopicRating,
+    getUserTopicRating,
+    rateTopic
   } = useChatAppContract();
   
   // Process messages from contract events
@@ -358,6 +361,9 @@ export function ChatInterface({ address }: ChatInterfaceProps) {
             getTopicId={getTopicId}
             getTopics={getTopics}
             createTopic={createTopic}
+            getTopicRating={getTopicRating}
+            getUserTopicRating={getUserTopicRating}
+            rateTopic={rateTopic}
           />
         </div>
 
